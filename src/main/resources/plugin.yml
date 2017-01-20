@@ -1,0 +1,11 @@
+name: TnTTricks
+main: me.drkmatr1984.TnTTricks.TnTTricks
+version: 0.1
+author: drkmatr1984
+softdepend: [WorldGuard, PacketListenerAPI]
+
+commands:   tnttricks:      aliases: [tnt]      description: displays the help and stuff
+permissions:
+    tnttricks.reload:
+        description: reload the config.
+        default: op    tnttricks.throw:        description: Throw Tnt When not placing on ground        default: op

@@ -1,0 +1,13 @@
+Explosions:
+  CreeperExplosionPower: 8.0
+  TnTExplosionPower: 7.0
+FlyingBlocks:
+  EnableFlyingBlocks: true
+  # Allow the Flying Blocks to form into blocks on Land
+  AllowFlyingBlockSettle: false
+# Enable the plugin on different worlds
+AllowedWorlds:
+  - Example_World
+  - world
+
+
