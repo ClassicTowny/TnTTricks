@@ -14,17 +14,8 @@ public class CreeperExplodeEvent extends EntityExplodeEvent implements Cancellab
 {
 	private static final HandlerList handlers = new HandlerList();
 	private Creeper creeper;
-    private Entity what;
-    private Location location;
-    private List<Block> blocks;
-    private float yield;
-    
-	public CreeperExplodeEvent(Entity what, Location location, List<Block> blocks, float yield) {
+    public CreeperExplodeEvent(Entity what, Location location, List<Block> blocks, float yield) {
 		super(what, location, blocks, yield);
-		this.what = what;
-		this.location = location;
-		this.blocks = blocks;
-		this.yield = yield;
 		this.creeper = (Creeper) what;	
 	}
 	

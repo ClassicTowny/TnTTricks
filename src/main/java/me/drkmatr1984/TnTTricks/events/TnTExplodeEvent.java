@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -17,21 +18,15 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.projectiles.BlockProjectileSource;
 
+import me.drkmatr1984.TnTTricks.serialization.DLUtils;
+
 public class TnTExplodeEvent extends EntityExplodeEvent implements Cancellable
 {
 	private static final HandlerList handlers = new HandlerList();
     private TNTPrimed tnt;
-    private Entity what;
-    private Location location;
-    private List<Block> blocks;
-    private float yield;
     
-	public TnTExplodeEvent(Entity what, Location location, List<Block> blocks, float yield) {
+    public TnTExplodeEvent(Entity what, Location location, List<Block> blocks, float yield) {
 		super(what, location, blocks, yield);			
-		this.what = what;
-	    this.location = location;
-	    this.blocks = blocks;
-	    this.yield = yield;
 		this.tnt = (TNTPrimed) what;
 	}
 
@@ -39,8 +34,8 @@ public class TnTExplodeEvent extends EntityExplodeEvent implements Cancellable
 		if(this.tnt!=null){
 			Entity source = this.tnt.getSource();
 			if(source!=null){
-                if(source instanceof TNTPrimed){
-    				//source = getChainTnTSource(source);
+                if(source instanceof TNTPrimed && Bukkit.getServer().getPluginManager().isPluginEnabled("TnTTricks")){
+    				source = getChainTnTSource((TNTPrimed)source);
     			}
     			if(source instanceof Projectile){
     				Projectile projectile = (Projectile) source;
@@ -57,11 +52,16 @@ public class TnTExplodeEvent extends EntityExplodeEvent implements Cancellable
     				if(projectile.getShooter() instanceof BlockProjectileSource){
     					Block b = ((BlockProjectileSource)projectile.getShooter()).getBlock();
     					if(b.getState() instanceof Dispenser){
-    						
+    						if(DLUtils.containsDispenserLocation(b.getLocation())){
+    							source = (DLUtils.getDispenserLocation(b.getLocation())).getPlayer();
+    						}   						 
     					}
-    				}
-    				
-    			} 			
+    				}    				
+    			}
+    			if(source instanceof Creeper){
+    				Creeper creep = (Creeper) source;
+    				source = creep.getTarget();
+    			}
     		}
     		if(tnt.getCustomName()!=null)
     		{
@@ -69,7 +69,7 @@ public class TnTExplodeEvent extends EntityExplodeEvent implements Cancellable
     			{
     				String uuid = tnt.getCustomName();
     				uuid = uuid.replace("source: ", "");
-    				source = Bukkit.getServer().getPlayer(UUID.fromString(uuid));
+    				source = Bukkit.getServer().getEntity(UUID.fromString(uuid));
     			}
     		}
     		return source;
@@ -89,28 +89,28 @@ public class TnTExplodeEvent extends EntityExplodeEvent implements Cancellable
 		return this.tnt;
 	}
 	
-	private Entity getChainTnTSource(Entity tnt){
-    	Entity next = tnt;
-    	TNTPrimed nTnt = null;
+	private Entity getChainTnTSource(TNTPrimed tnt){
+    	TNTPrimed nTnt = tnt;
+    	Entity finalEntity = null;
 		do
 		{
-			if(next!=null){
-				if(next instanceof TNTPrimed){
-					nTnt = (TNTPrimed) next;
-					next = nTnt.getSource();				
-				}
-			}else{
-				if(nTnt.getCustomName()!=null)
-    			{
-    				if(nTnt.getCustomName().contains("source: "))
-    				{
-    					String uuid = nTnt.getCustomName();
-    					next = Bukkit.getServer().getPlayer(UUID.fromString(uuid.replace("source: ", "")));
-    				}
-    			}
+			if(!(nTnt.getSource() instanceof TNTPrimed)){
+				if(nTnt.getSource()==null){
+					if(nTnt.getCustomName()!=null)
+	    			{
+	    				if(nTnt.getCustomName().contains("source: "))
+	    				{
+	    					String uuid = nTnt.getCustomName();
+	    					finalEntity = Bukkit.getServer().getEntity(UUID.fromString(uuid.replace("source: ", "")));
+	    				}
+	    			}
+				}else{
+					finalEntity = nTnt.getSource();
+				}				
 			}
-		}while(next instanceof TNTPrimed && next!=null);
-		return next;
+			
+		}while(nTnt instanceof TNTPrimed);
+		return finalEntity;
     }
 
 	public HandlerList getHandlers() {

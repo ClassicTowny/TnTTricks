@@ -29,6 +29,8 @@ public class EntityThrowListeners implements Listener
         	if(player.hasPermission("tnttricks.throw") && (event.getAction() == Action.RIGHT_CLICK_AIR) && !(plugin.toggles.hasDisabledThrowPlayer(player))) {
         		if(throwUtils.throwTNT(player)){
         			return;
+        		}else{
+        			event.setCancelled(true);
         		}
         	}
         }

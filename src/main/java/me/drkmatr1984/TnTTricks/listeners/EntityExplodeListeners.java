@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import me.drkmatr1984.TnTTricks.TnTTricks;
+import me.drkmatr1984.TnTTricks.config.Config;
 import me.drkmatr1984.TnTTricks.events.CreeperExplodeEvent;
 import me.drkmatr1984.TnTTricks.events.TnTExplodeEvent;
 import me.drkmatr1984.TnTTricks.utils.explodeUtils;
@@ -24,22 +25,24 @@ public class EntityExplodeListeners implements Listener
 		this.plugin = plugin;
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityTnTExplode(final EntityExplodeEvent e){
     	if(e.getEntity() instanceof TNTPrimed){
     		TnTExplodeEvent event = new TnTExplodeEvent(e.getEntity(), e.getLocation(), e.blockList(), e.getYield());     	
             Bukkit.getServer().getPluginManager().callEvent(event);
             if (event.isCancelled()) {
+            	e.setCancelled(true);
                 return;
             }
     	}
     }
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityCreeperExplode(final EntityExplodeEvent e){
     	if(e.getEntity() instanceof Creeper){
     		CreeperExplodeEvent event = new CreeperExplodeEvent(e.getEntity(), e.getLocation(), e.blockList(), e.getYield());
     		Bukkit.getServer().getPluginManager().callEvent(event);
             if (event.isCancelled()) {
+            	e.setCancelled(true);
                 return;
             }
     	}
@@ -50,7 +53,10 @@ public class EntityExplodeListeners implements Listener
     	Entity entity = event.getEntity();
     	World world = entity.getWorld();
     	if (this.plugin.getConfig().getStringList("AllowedWorlds").contains(event.getLocation().getWorld().getName())) {
-    		explodeUtils.explodeBlocks(world, entity, event.blockList(), plugin);
+    		if(!explodeUtils.explodeBlocks(world, entity, event.blockList(), plugin)){
+    			event.setCancelled(true);
+    			return;
+    		}
     	}
     }
     
@@ -58,26 +64,19 @@ public class EntityExplodeListeners implements Listener
     public void onCreeperExplode(CreeperExplodeEvent event) {
     	Entity entity = event.getEntity();
     	World world = entity.getWorld();
-    	float explosionPower = 8.0f;
     	if (this.plugin.getConfig().getStringList("AllowedWorlds").contains(event.getLocation().getWorld().getName())) {
-    		explodeUtils.explodeBlocks(world, entity, event.blockList(), plugin);
-    		if(this.plugin.getConfig().getString("Explosions.CreeperExplosionPower")!=null){
-    			explosionPower = Float.parseFloat((this.plugin.getConfig().getString("Explosions.CreeperExplosionPower"))+"f");
-    		}
-            event.setCancelled(true);
-            event.getLocation().getWorld().createExplosion(event.getLocation(), explosionPower); 		
+    		if(explodeUtils.explodeBlocks(world, entity, event.blockList(), plugin)){
+    			event.setCancelled(true);
+                event.getLocation().getWorld().createExplosion(event.getLocation(), Config.getCreeperExplosionPower());
+    		} 		
     	}  	
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void TNTPower(final ExplosionPrimeEvent event) {
     	if(event.getEntityType() == EntityType.PRIMED_TNT){
-    		float explosionPower = 7.0f;
-            if (this.plugin.getConfig().getStringList("AllowedWorlds").contains(event.getEntity().getWorld().getName())) {
-            	if(this.plugin.getConfig().getString("Explosions.TnTExplosionPower")!=null){
-            		explosionPower = Float.parseFloat((this.plugin.getConfig().getString("Explosions.TnTExplosionPower"))+"f");
-            	}
-            	event.setRadius(explosionPower);
+            if (this.plugin.getConfig().getStringList("AllowedWorlds").contains(event.getEntity().getWorld().getName())) {				
+            	event.setRadius(Config.getTntExplosionPower());
             }
     	}   	
     }

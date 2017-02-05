@@ -1,30 +1,32 @@
-package me.drkmatr1984.TnTTricks.utils;
+package me.drkmatr1984.TnTTricks.serialization;
 
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-public class DispenserLocationSerialization {
-    public static String toBase64(Set<DispenserLocation> setLocs) {
+public class SetSerialization {
+    public static String toBase64(Set<DispenserLocation> dispenserLocations) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
             // Save every element in the list
-            for (DispenserLocation loc : setLocs) {
+            for (Object loc : dispenserLocations) {
                 dataOutput.writeObject(loc);
             }           
             // Serialize that array
             dataOutput.close();
             return Base64Coder.encodeLines(outputStream.toByteArray());
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to save blocks.", e);
+            throw new IllegalStateException("Unable to save DispenserLocations.", e);
         }        
     }
     
@@ -43,4 +45,26 @@ public class DispenserLocationSerialization {
             throw new IOException("Unable to decode class type.", e);
         }
     }
+    
+    public static Set<DispenserLocation> listToSet(List<DispenserLocation> list){
+		Set<DispenserLocation> setString = new HashSet<DispenserLocation>();
+		for(DispenserLocation s : list){
+			setString.add(s);
+		}
+		if(!(setString.isEmpty())){
+			return setString;
+		}
+		return null;
+	}
+	
+	public static List<DispenserLocation> setToList(Set<DispenserLocation> list){
+		List<DispenserLocation> setString = new ArrayList<DispenserLocation>();
+		for(DispenserLocation s : list){
+			setString.add(s);
+		}
+		if(!(setString.isEmpty())){
+			return setString;
+		}
+		return null;
+	}
 }

@@ -1,9 +1,15 @@
 package me.drkmatr1984.TnTTricks.listeners;
 
+import java.util.List;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -11,6 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 
 import me.drkmatr1984.TnTTricks.TnTTricks;
+import me.drkmatr1984.TnTTricks.serialization.DLUtils;
 
 public class BlockListeners implements Listener
 {
@@ -46,9 +53,35 @@ public class BlockListeners implements Listener
                 t.getWorld().playEffect(t.getLocation(), Effect.MOBSPAWNER_FLAMES, 100, 100);
             }
             if(t.getType() == Material.DISPENSER){
-            	this.plugin.addDispenserLocation(e.getPlayer(), t.getLocation());
+            	DLUtils.addDispenserLocation(e.getPlayer(), t.getLocation());
             }
         }
+        
+        //  ******************      Make TnT Autolight on place if enabled ********************
+        
+        /*
+        if (this.plugin.getConfig().getBoolean("autoLightOnPlace"))
+        {
+          String Prefix = this.plugin.getConfig().getString("prefix");
+          String Message = this.plugin.getConfig().getString("messages.tntplacemessage");
+          Block b = e.getBlock();
+          Player p = e.getPlayer();
+          List<String> Allowed = this.plugin.getConfig().getStringList("worlds");
+          List<String> Disabled = this.plugin.getConfig().getStringList("disabled-players");
+          if ((b.getType() == Material.TNT) && 
+            (Allowed.contains(p.getWorld().getName())) && 
+            (!Disabled.contains(p.getName())) && 
+            (p.hasPermission("autotnt.use")) && (p.isOp()))
+          {
+            b.setType(Material.AIR);
+            Location l = b.getLocation().add(0.5D, 0.0D, 0.5D);
+            b.getWorld().spawnEntity(l, EntityType.PRIMED_TNT);
+            if (this.plugin.getConfig().getBoolean("sendmessageonplace")) {
+              p.sendMessage(ChatColor.translateAlternateColorCodes('&', Prefix + Message));
+            }
+          }
+        }
+        */
     }
     
     @EventHandler
@@ -60,4 +93,5 @@ public class BlockListeners implements Listener
             }
         }
     }
+    
 }
