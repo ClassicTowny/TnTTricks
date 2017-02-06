@@ -1,7 +1,10 @@
 package me.drkmatr1984.TnTTricks.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
@@ -9,15 +12,15 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
-import me.drkmatr1984.TnTTricks.TnTTricks;
 import me.drkmatr1984.TnTTricks.events.ExplosionLaunchBlockEvent;
 public class explodeUtils{
 	
+	private static List<String> entityList = new ArrayList<String>();
+	
 	@SuppressWarnings("deprecation")
-	public static boolean explodeBlocks(World world, Entity entity, List<Block> blockList, Plugin plugin){
+	public static boolean explodeBlocks(World world, Entity entity, List<Block> blockList){
 		HashMap<FallingBlock,Block> blockToFallingBlock = new HashMap<FallingBlock,Block>(); 
 		final float x = -2.0f + (float)(Math.random() * 5.0);
 	    final float y = -3.0f + (float)(Math.random() * 7.0);
@@ -66,12 +69,32 @@ public class explodeUtils{
 		        b.getWorld().playEffect(b.getLocation(), Effect.MOBSPAWNER_FLAMES, 100, 100);
 	    		f.setVelocity(event.getVelocity());
 	    		f.setDropItem(event.isDropItem());
-	    		if(plugin instanceof TnTTricks){
-		        	  TnTTricks tricks = (TnTTricks) plugin;
-		        	  tricks.addEntityUUID(f.getUniqueId());
-		        }
+	    		addEntityUUID(f.getUniqueId());
 	    	}
 	    	return true;
 	    }
 	}
+	
+	public static void addEntityUUID(UUID id)
+    {
+        String uuid = id.toString();
+        entityList.add(uuid);
+    }
+ 
+    public static void removeEntityBlock(UUID id)
+    {
+        String uuid = id.toString();
+        if (entityList.contains(uuid)) 
+        	entityList.remove(uuid);
+    }
+ 
+    public static boolean containsBlock(UUID id)
+    {
+        String uuid = id.toString();
+        if (explodeUtils.entityList.contains(uuid))
+        {
+            return true;
+        }
+        return false;
+    }
 }

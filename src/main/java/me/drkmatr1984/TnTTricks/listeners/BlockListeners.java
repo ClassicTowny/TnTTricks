@@ -1,15 +1,9 @@
 package me.drkmatr1984.TnTTricks.listeners;
 
-import java.util.List;
-
-import org.bukkit.ChatColor;
 import org.bukkit.Effect;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -17,7 +11,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 
 import me.drkmatr1984.TnTTricks.TnTTricks;
+import me.drkmatr1984.TnTTricks.config.Config;
 import me.drkmatr1984.TnTTricks.serialization.DLUtils;
+import me.drkmatr1984.TnTTricks.utils.explodeUtils;
 
 public class BlockListeners implements Listener
 {
@@ -30,15 +26,15 @@ public class BlockListeners implements Listener
 	
 	@EventHandler
     public void EntityChangeBlockEvent(final EntityChangeBlockEvent e) {
-        if (this.plugin.getConfig().getStringList("AllowedWorlds").contains(e.getBlock().getWorld().getName()) && e.getEntity() instanceof FallingBlock) {
+        if (!Config.getDisabledWorlds().contains(e.getBlock().getWorld()) && e.getEntity() instanceof FallingBlock) {
             final Block f = e.getBlock();
             if (e.getEntity().isOnGround()) {
                 f.getWorld().playEffect(f.getLocation(), Effect.STEP_SOUND, 100);
                 if(!this.plugin.getConfig().getBoolean("FlyingBlocks.AllowFlyingBlockSettle")){
-                	if (this.plugin.containsBlock(e.getEntity().getUniqueId()))
+                	if (explodeUtils.containsBlock(e.getEntity().getUniqueId()))
                     {
                 		e.setCancelled(true);
-                		this.plugin.removeEntityBlock(e.getEntity().getUniqueId());               
+                		explodeUtils.removeEntityBlock(e.getEntity().getUniqueId());               
                     }
                 }
             }
@@ -47,7 +43,7 @@ public class BlockListeners implements Listener
     
     @EventHandler
     public void onBlockPlaceEvent(final BlockPlaceEvent e) {
-        if (this.plugin.getConfig().getStringList("AllowedWorlds").contains(e.getPlayer().getWorld().getName())) {
+        if (!Config.getDisabledWorlds().contains(e.getPlayer().getWorld())) {
             final Block t = e.getBlockPlaced();
             if (t.getType() == Material.TNT) {
                 t.getWorld().playEffect(t.getLocation(), Effect.MOBSPAWNER_FLAMES, 100, 100);
@@ -86,7 +82,7 @@ public class BlockListeners implements Listener
     
     @EventHandler
     public void onBlockBreakEvent(final BlockBreakEvent e) {
-        if (this.plugin.getConfig().getStringList("AllowedWorlds").contains(e.getPlayer().getWorld().getName())) {
+        if (!Config.getDisabledWorlds().contains(e.getPlayer().getWorld())) {
             final Block t = e.getBlock();
             if (t.getType() == Material.TNT) {
                 t.getWorld().playEffect(t.getLocation(), Effect.SMOKE, 100, 100);

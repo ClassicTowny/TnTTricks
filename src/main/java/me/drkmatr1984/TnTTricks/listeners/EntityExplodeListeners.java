@@ -11,7 +11,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
-import me.drkmatr1984.TnTTricks.TnTTricks;
 import me.drkmatr1984.TnTTricks.config.Config;
 import me.drkmatr1984.TnTTricks.events.CreeperExplodeEvent;
 import me.drkmatr1984.TnTTricks.events.TnTExplodeEvent;
@@ -19,11 +18,7 @@ import me.drkmatr1984.TnTTricks.utils.explodeUtils;
 
 public class EntityExplodeListeners implements Listener
 {
-	private TnTTricks plugin;
-	
-	public EntityExplodeListeners(TnTTricks plugin){
-		this.plugin = plugin;
-	}
+	public EntityExplodeListeners(){}
 	
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityTnTExplode(final EntityExplodeEvent e){
@@ -52,8 +47,8 @@ public class EntityExplodeListeners implements Listener
     public void onTnTExplode(TnTExplodeEvent event) {
     	Entity entity = event.getEntity();
     	World world = entity.getWorld();
-    	if (this.plugin.getConfig().getStringList("AllowedWorlds").contains(event.getLocation().getWorld().getName())) {
-    		if(!explodeUtils.explodeBlocks(world, entity, event.blockList(), plugin)){
+    	if (!Config.getDisabledWorlds().contains(event.getLocation().getWorld())) {
+    		if(!explodeUtils.explodeBlocks(world, entity, event.blockList())){
     			event.setCancelled(true);
     			return;
     		}
@@ -64,8 +59,8 @@ public class EntityExplodeListeners implements Listener
     public void onCreeperExplode(CreeperExplodeEvent event) {
     	Entity entity = event.getEntity();
     	World world = entity.getWorld();
-    	if (this.plugin.getConfig().getStringList("AllowedWorlds").contains(event.getLocation().getWorld().getName())) {
-    		if(explodeUtils.explodeBlocks(world, entity, event.blockList(), plugin)){
+    	if (!Config.getDisabledWorlds().contains(event.getLocation().getWorld())) {
+    		if(explodeUtils.explodeBlocks(world, entity, event.blockList())){
     			event.setCancelled(true);
                 event.getLocation().getWorld().createExplosion(event.getLocation(), Config.getCreeperExplosionPower());
     		} 		
@@ -75,7 +70,7 @@ public class EntityExplodeListeners implements Listener
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void TNTPower(final ExplosionPrimeEvent event) {
     	if(event.getEntityType() == EntityType.PRIMED_TNT){
-            if (this.plugin.getConfig().getStringList("AllowedWorlds").contains(event.getEntity().getWorld().getName())) {				
+            if (!Config.getDisabledWorlds().contains(event.getEntity().getWorld())) {				
             	event.setRadius(Config.getTntExplosionPower());
             }
     	}   	

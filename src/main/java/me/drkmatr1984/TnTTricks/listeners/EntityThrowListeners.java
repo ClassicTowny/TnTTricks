@@ -10,6 +10,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import me.drkmatr1984.TnTTricks.TnTTricks;
+import me.drkmatr1984.TnTTricks.config.Config;
 import me.drkmatr1984.TnTTricks.events.EntityThrowTnTEvent;
 import me.drkmatr1984.TnTTricks.utils.throwUtils;
 
@@ -42,6 +43,10 @@ public class EntityThrowListeners implements Listener
     		event.setCancelled(true);
     		return;
     	}
+    	if(Config.getDisabledWorlds().contains(event.getEntity().getWorld())){
+    		event.setCancelled(true);
+    		return;
+    	}   		
     	Player player = (Player) event.getEntity();
         ItemStack item = player.getInventory().getItemInMainHand();
     	if(item.getType() == Material.TNT){ 

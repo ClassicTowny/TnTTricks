@@ -6,8 +6,8 @@ FlyingBlocks:
   # Allow the Flying Blocks to form into blocks on Land
   AllowFlyingBlockSettle: false
 # Enable the plugin on different worlds
-AllowedWorlds:
+DisabledWorlds:
   - Example_World
-  - world
+  - world_the_end
 
 
